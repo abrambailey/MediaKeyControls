@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Bandcamp Media Key Controls",
+  "version": "1.0",
+  "description": "Control Bandcamp with media keys via native app",
+  "permissions": [
+    "nativeMessaging",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "*://*.bandcamp.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.bandcamp.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "icons": {
+    "128": "icon128.png"
+  }
+}

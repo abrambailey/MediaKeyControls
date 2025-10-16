@@ -1,0 +1,33 @@
+# Xcode
+*.xcuserstate
+*.xcuserdatad
+xcuserdata/
+DerivedData/
+build/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.moved-aside
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# App builds
+*.app
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.swiftpm
+.build/
+
+# CocoaPods
+Pods/
+*.xcworkspace
+!default.xcworkspace
+
+# Carthage
+Carthage/Build
