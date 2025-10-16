@@ -51,6 +51,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ success: false, message: 'Previous not available' });
       }
     }
+  } else if (message.action === 'getPlayingState') {
+    const button = document.querySelector('.playbutton');
+    const isPlaying = button && button.classList.contains('playing');
+    console.log('[Bandcamp Controls] Playing state:', isPlaying);
+    sendResponse({ success: true, isPlaying: isPlaying });
   }
 
   return true; // Keep message channel open for async response

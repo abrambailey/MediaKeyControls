@@ -188,3 +188,55 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log('[Bandcamp Controls] Content script ready in tab:', sender.tab.id);
   }
 });
+
+// Periodically check playing state and notify native host
+function checkPlayingState() {
+  chrome.tabs.query({ url: '*://*.bandcamp.com/*' }, (tabs) => {
+    const hasTabs = tabs.length > 0;
+
+    if (hasTabs) {
+      // Check each tab for playing state
+      let isAnyPlaying = false;
+      let checkedCount = 0;
+
+      if (tabs.length === 0) {
+        notifyTabState(false, false);
+        return;
+      }
+
+      tabs.forEach((tab) => {
+        chrome.tabs.sendMessage(tab.id, { action: 'getPlayingState' }, (response) => {
+          checkedCount++;
+          if (response && response.isPlaying) {
+            isAnyPlaying = true;
+          }
+
+          // Once we've checked all tabs, notify
+          if (checkedCount === tabs.length) {
+            notifyTabState(hasTabs, isAnyPlaying);
+          }
+        });
+      });
+    } else {
+      notifyTabState(false, false);
+    }
+  });
+}
+
+function notifyTabState(hasTabs, isPlaying) {
+  // Send notification to native host via distributed notifications
+  // The native host will forward this to the main app
+  if (port) {
+    port.postMessage({
+      type: 'tabState',
+      hasTabs: hasTabs,
+      isPlaying: isPlaying
+    });
+  }
+  console.log('[Bandcamp Controls] 📊 Tab state - hasTabs:', hasTabs, 'isPlaying:', isPlaying);
+}
+
+// Check playing state every 2 seconds
+setInterval(checkPlayingState, 2000);
+// Also check immediately on load
+checkPlayingState();

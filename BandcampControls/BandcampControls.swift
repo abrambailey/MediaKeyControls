@@ -1,5 +1,6 @@
 import SwiftUI
 import ApplicationServices
+import ServiceManagement
 
 @main
 struct BandcampControlsApp: App {
@@ -34,19 +35,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if !hasPermission {
             NSLog("[BC] ⚠️ Missing Accessibility permissions - system dialog shown")
 
-            // Check again after a delay in case user enables it
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
-                if self?.checkAccessibilityPermissions() == true {
-                    NSLog("[BC] ✅ Permissions granted! Starting listener...")
-                    self?.mediaKeyHandler?.startListening()
+            // Check again after a delay in case user enables it (without re-prompting)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
+                if self?.checkAccessibilityPermissions(prompt: false) == true {
+                    NSLog("[BC] ✅ Permissions granted! Starting listener with retry...")
+                    self?.startListenerWithRetry()
                 } else {
                     NSLog("[BC] ⚠️ Still no permissions. Use 'Check Permissions' menu to restart.")
                 }
             }
         } else {
-            // Start listening for media keys
-            NSLog("[BC] Starting media key listener...")
-            mediaKeyHandler?.startListening()
+            // Permissions already granted - start immediately with retry logic
+            NSLog("[BC] Permissions already granted, starting listener with retry...")
+            startListenerWithRetry()
         }
 
         NSLog("[BC] BandcampControls ready!")
@@ -72,6 +73,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let toggleTitle = isEnabled ? "✓ Media Keys Enabled" : "Media Keys Disabled"
         let toggleItem = NSMenuItem(title: toggleTitle, action: #selector(toggleMediaKeys), keyEquivalent: "e")
         menu.addItem(toggleItem)
+        menu.addItem(NSMenuItem.separator())
+
+        // Add start at login toggle
+        let startsAtLogin = isStartAtLoginEnabled()
+        let loginTitle = startsAtLogin ? "✓ Start at Login" : "Start at Login"
+        let loginItem = NSMenuItem(title: loginTitle, action: #selector(toggleStartAtLogin), keyEquivalent: "")
+        menu.addItem(loginItem)
         menu.addItem(NSMenuItem.separator())
 
         // Add test buttons
@@ -134,6 +142,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         )
     }
 
+    func startListenerWithRetry(attempt: Int = 1, maxAttempts: Int = 3) {
+        NSLog("[BC] Starting listener (attempt \(attempt)/\(maxAttempts))...")
+
+        mediaKeyHandler?.stopListening()
+        mediaKeyHandler?.startListening()
+
+        // Retry a few times with increasing delays to ensure permissions have propagated
+        if attempt < maxAttempts {
+            let delay = Double(attempt) * 1.0  // 1s, 2s, 3s delays
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                self?.startListenerWithRetry(attempt: attempt + 1, maxAttempts: maxAttempts)
+            }
+        } else {
+            NSLog("[BC] ✅ Listener start attempts complete!")
+        }
+    }
+
     @objc func recheckPermissions() {
         NSLog("[BC] Manually rechecking permissions...")
         let wasGranted = checkAccessibilityPermissions()
@@ -154,12 +179,76 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @objc func toggleStartAtLogin() {
+        if isStartAtLoginEnabled() {
+            disableStartAtLogin()
+        } else {
+            enableStartAtLogin()
+        }
+        updateMenu()
+    }
+
+    func isStartAtLoginEnabled() -> Bool {
+        if #available(macOS 13.0, *) {
+            return SMAppService.mainApp.status == .enabled
+        } else {
+            // For older macOS versions, check UserDefaults as fallback
+            return UserDefaults.standard.bool(forKey: "startAtLogin")
+        }
+    }
+
+    func enableStartAtLogin() {
+        if #available(macOS 13.0, *) {
+            do {
+                try SMAppService.mainApp.register()
+                NSLog("[BC] ✅ Start at login enabled")
+
+                let alert = NSAlert()
+                alert.messageText = "Start at Login Enabled"
+                alert.informativeText = "BandcampControls will now start automatically when you log in."
+                alert.alertStyle = .informational
+                alert.runModal()
+            } catch {
+                NSLog("[BC] ❌ Failed to enable start at login: \(error)")
+
+                let alert = NSAlert()
+                alert.messageText = "Failed to Enable"
+                alert.informativeText = "Could not enable start at login: \(error.localizedDescription)"
+                alert.alertStyle = .warning
+                alert.runModal()
+            }
+        } else {
+            UserDefaults.standard.set(true, forKey: "startAtLogin")
+            NSLog("[BC] ⚠️ Start at login saved to preferences (requires manual setup on macOS < 13)")
+        }
+    }
+
+    func disableStartAtLogin() {
+        if #available(macOS 13.0, *) {
+            do {
+                try SMAppService.mainApp.unregister()
+                NSLog("[BC] ✅ Start at login disabled")
+
+                let alert = NSAlert()
+                alert.messageText = "Start at Login Disabled"
+                alert.informativeText = "BandcampControls will no longer start automatically."
+                alert.alertStyle = .informational
+                alert.runModal()
+            } catch {
+                NSLog("[BC] ❌ Failed to disable start at login: \(error)")
+            }
+        } else {
+            UserDefaults.standard.set(false, forKey: "startAtLogin")
+            NSLog("[BC] ⚠️ Start at login disabled in preferences")
+        }
+    }
+
     @objc func quit() {
         NSApplication.shared.terminate(nil)
     }
 
-    func checkAccessibilityPermissions() -> Bool {
-        let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
+    func checkAccessibilityPermissions(prompt: Bool = true) -> Bool {
+        let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: prompt]
         let trusted = AXIsProcessTrustedWithOptions(options)
         NSLog("[BC] Accessibility check result: \(trusted)")
         return trusted

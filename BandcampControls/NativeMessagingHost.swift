@@ -45,15 +45,37 @@ class NativeMessagingHost {
             if let json = try? JSONSerialization.jsonObject(with: messageData) as? [String: Any] {
                 logToFile("Received from Chrome: \(json)")
 
-                // Track whether Bandcamp tabs exist
-                if let success = json["success"] as? Bool {
-                    hasBandcampTabs = success
+                // Handle tab state updates
+                if let type = json["type"] as? String, type == "tabState" {
+                    let hasTabs = json["hasTabs"] as? Bool ?? false
+                    let isPlaying = json["isPlaying"] as? Bool ?? false
+
+                    hasBandcampTabs = hasTabs
 
                     // Notify main app about tab state
                     DistributedNotificationCenter.default().post(
                         name: NSNotification.Name("com.bandcamp.controls.tabstate"),
                         object: nil,
-                        userInfo: ["hasTabs": hasBandcampTabs]
+                        userInfo: [
+                            "hasTabs": hasTabs,
+                            "isPlaying": isPlaying
+                        ]
+                    )
+
+                    logToFile("Notified main app: hasTabs=\(hasTabs), isPlaying=\(isPlaying)")
+                }
+                // Handle legacy success responses
+                else if let success = json["success"] as? Bool {
+                    hasBandcampTabs = success
+
+                    // Notify main app about successful control
+                    DistributedNotificationCenter.default().post(
+                        name: NSNotification.Name("com.bandcamp.controls.tabstate"),
+                        object: nil,
+                        userInfo: [
+                            "hasTabs": hasBandcampTabs,
+                            "success": success
+                        ]
                     )
                 }
             }
