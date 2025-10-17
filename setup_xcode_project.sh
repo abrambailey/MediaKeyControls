@@ -2,7 +2,7 @@
 
 set -e
 
-PROJECT_NAME="BandcampControls"
+PROJECT_NAME="MediaKeyControls"
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BUILD_DIR="$PROJECT_DIR/build"
 
@@ -22,18 +22,20 @@ cat > "$PROJECT_NAME.xcodeproj/project.pbxproj" << 'EOF'
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BandcampControlsApp /* BandcampControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = BandcampControlsAppRef; };
+		MediaControlsApp /* MediaControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = MediaControlsAppRef; };
 		MediaKeyHandlerBuild /* MediaKeyHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = MediaKeyHandlerRef; };
 		BandcampControllerBuild /* BandcampController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BandcampControllerRef; };
+		YouTubeControllerBuild /* YouTubeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = YouTubeControllerRef; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		AppProduct /* BandcampControls.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BandcampControls.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		BandcampControlsAppRef /* BandcampControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandcampControls.swift; sourceTree = "<group>"; };
+		AppProduct /* MediaKeyControls.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MediaKeyControls.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		MediaControlsAppRef /* MediaControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaControls.swift; sourceTree = "<group>"; };
 		MediaKeyHandlerRef /* MediaKeyHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaKeyHandler.swift; sourceTree = "<group>"; };
 		BandcampControllerRef /* BandcampController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandcampController.swift; sourceTree = "<group>"; };
+		YouTubeControllerRef /* YouTubeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YouTubeController.swift; sourceTree = "<group>"; };
 		InfoPlistRef /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		EntitlementsRef /* BandcampControls.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BandcampControls.entitlements; sourceTree = "<group>"; };
+		EntitlementsRef /* MediaControls.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MediaControls.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,7 +52,7 @@ cat > "$PROJECT_NAME.xcodeproj/project.pbxproj" << 'EOF'
 		MainGroup = {
 			isa = PBXGroup;
 			children = (
-				SourceGroup /* BandcampControls */,
+				SourceGroup /* MediaKeyControls */,
 				ProductsGroup /* Products */,
 			);
 			sourceTree = "<group>";
@@ -58,29 +60,30 @@ cat > "$PROJECT_NAME.xcodeproj/project.pbxproj" << 'EOF'
 		ProductsGroup /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				AppProduct /* BandcampControls.app */,
+				AppProduct /* MediaKeyControls.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		SourceGroup /* BandcampControls */ = {
+		SourceGroup /* MediaControls */ = {
 			isa = PBXGroup;
 			children = (
-				BandcampControlsAppRef /* BandcampControls.swift */,
+				MediaControlsAppRef /* MediaControls.swift */,
 				MediaKeyHandlerRef /* MediaKeyHandler.swift */,
 				BandcampControllerRef /* BandcampController.swift */,
+				YouTubeControllerRef /* YouTubeController.swift */,
 				InfoPlistRef /* Info.plist */,
-				EntitlementsRef /* BandcampControls.entitlements */,
+				EntitlementsRef /* MediaControls.entitlements */,
 			);
-			path = BandcampControls;
+			path = MediaControls;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		AppTarget /* BandcampControls */ = {
+		AppTarget /* MediaKeyControls */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = ConfigList /* Build configuration list for PBXNativeTarget "BandcampControls" */;
+			buildConfigurationList = ConfigList /* Build configuration list for PBXNativeTarget "MediaKeyControls" */;
 			buildPhases = (
 				SourcesPhase /* Sources */,
 				FrameworksPhase /* Frameworks */,
@@ -90,9 +93,9 @@ cat > "$PROJECT_NAME.xcodeproj/project.pbxproj" << 'EOF'
 			);
 			dependencies = (
 			);
-			name = BandcampControls;
-			productName = BandcampControls;
-			productReference = AppProduct /* BandcampControls.app */;
+			name = MediaKeyControls;
+			productName = MediaKeyControls;
+			productReference = AppProduct /* MediaKeyControls.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -105,7 +108,7 @@ cat > "$PROJECT_NAME.xcodeproj/project.pbxproj" << 'EOF'
 				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1500;
 			};
-			buildConfigurationList = ProjectConfigList /* Build configuration list for PBXProject "BandcampControls" */;
+			buildConfigurationList = ProjectConfigList /* Build configuration list for PBXProject "MediaKeyControls" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -118,7 +121,7 @@ cat > "$PROJECT_NAME.xcodeproj/project.pbxproj" << 'EOF'
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				AppTarget /* BandcampControls */,
+				AppTarget /* MediaKeyControls */,
 			);
 		};
 /* End PBXProject section */
@@ -138,9 +141,10 @@ cat > "$PROJECT_NAME.xcodeproj/project.pbxproj" << 'EOF'
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BandcampControlsApp /* BandcampControls.swift in Sources */,
+				MediaControlsApp /* MediaControls.swift in Sources */,
 				MediaKeyHandlerBuild /* MediaKeyHandler.swift in Sources */,
 				BandcampControllerBuild /* BandcampController.swift in Sources */,
+				YouTubeControllerBuild /* YouTubeController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -265,7 +269,7 @@ cat > "$PROJECT_NAME.xcodeproj/project.pbxproj" << 'EOF'
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = BandcampControls/BandcampControls.entitlements;
+				CODE_SIGN_ENTITLEMENTS = MediaKeyControls/MediaKeyControls.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -273,7 +277,7 @@ cat > "$PROJECT_NAME.xcodeproj/project.pbxproj" << 'EOF'
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = BandcampControls/Info.plist;
+				INFOPLIST_FILE = MediaKeyControls/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_LSUIElement = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -294,7 +298,7 @@ cat > "$PROJECT_NAME.xcodeproj/project.pbxproj" << 'EOF'
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = BandcampControls/BandcampControls.entitlements;
+				CODE_SIGN_ENTITLEMENTS = MediaKeyControls/MediaKeyControls.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -302,7 +306,7 @@ cat > "$PROJECT_NAME.xcodeproj/project.pbxproj" << 'EOF'
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = BandcampControls/Info.plist;
+				INFOPLIST_FILE = MediaKeyControls/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_LSUIElement = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -321,7 +325,7 @@ cat > "$PROJECT_NAME.xcodeproj/project.pbxproj" << 'EOF'
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		ProjectConfigList /* Build configuration list for PBXProject "BandcampControls" */ = {
+		ProjectConfigList /* Build configuration list for PBXProject "MediaKeyControls" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DebugConfig /* Debug */,
@@ -330,7 +334,7 @@ cat > "$PROJECT_NAME.xcodeproj/project.pbxproj" << 'EOF'
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		ConfigList /* Build configuration list for PBXNativeTarget "BandcampControls" */ = {
+		ConfigList /* Build configuration list for PBXNativeTarget "MediaKeyControls" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AppDebugConfig /* Debug */,
@@ -348,7 +352,7 @@ EOF
 echo "✓ Created Xcode project structure"
 echo ""
 echo "Next steps:"
-echo "1. Open BandcampControls.xcodeproj in Xcode"
+echo "1. Open MediaKeyControls.xcodeproj in Xcode"
 echo "2. Build and run (⌘+R)"
 echo "3. Grant Accessibility permissions when prompted"
-echo "4. Enjoy controlling Bandcamp with media keys!"
+echo "4. Enjoy controlling your media with media keys!"

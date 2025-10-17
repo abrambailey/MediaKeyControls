@@ -36,6 +36,7 @@ class BandcampController {
         btn.dispatchEvent(evt);
         return 'dispatched prev';
     }
+    // Fallback: restart current track by clicking beginning of progress bar
     var bar = document.querySelector('.progbar_empty');
     if (bar) {
         var r = bar.getBoundingClientRect();
@@ -48,17 +49,17 @@ class BandcampController {
 """
 
     func togglePlayPause() {
-        NSLog("[BC] ▶️ Executing play/pause on Bandcamp...")
+        NSLog("[MC] ▶️ Executing play/pause on Bandcamp...")
         executeJavaScriptOnBandcamp(script: playPauseScript)
     }
 
     func skipForward() {
-        NSLog("[BC] ⏭ Executing skip forward on Bandcamp...")
+        NSLog("[MC] ⏭ Executing skip forward on Bandcamp...")
         executeJavaScriptOnBandcamp(script: skipForwardScript)
     }
 
     func skipBackward() {
-        NSLog("[BC] ⏮ Executing skip backward on Bandcamp...")
+        NSLog("[MC] ⏮ Executing skip backward on Bandcamp...")
         executeJavaScriptOnBandcamp(script: skipBackwardScript)
     }
 
@@ -77,7 +78,7 @@ class BandcampController {
     }
 
     private func executeSafariScript(script: String) -> Bool {
-        NSLog("[BC] 🧭 Trying Safari with script: \(script)")
+        NSLog("[MC] 🧭 Trying Safari with script: \(script)")
 
         let appleScript = """
         tell application "Safari"
@@ -100,19 +101,19 @@ class BandcampController {
         if let scriptObject = NSAppleScript(source: appleScript) {
             let result = scriptObject.executeAndReturnError(&error)
             if let err = error {
-                NSLog("[BC] ❌ Safari error: \(err)")
+                NSLog("[MC] ❌ Safari error: \(err)")
             }
             if error == nil && result.booleanValue {
-                NSLog("[BC] ✅ Executed JavaScript on Safari successfully")
+                NSLog("[MC] ✅ Executed JavaScript on Safari successfully")
                 return true
             } else {
-                NSLog("[BC] ❌ Safari script returned false or had error")
+                NSLog("[MC] ❌ Safari script returned false or had error")
             }
         } else {
-            NSLog("[BC] ❌ Failed to create AppleScript object")
+            NSLog("[MC] ❌ Failed to create AppleScript object")
         }
 
-        NSLog("[BC] ❌ Safari: No Bandcamp tab found")
+        NSLog("[MC] ❌ Safari: No Bandcamp tab found")
         return false
     }
 
@@ -120,7 +121,7 @@ class BandcampController {
         let browsers = ["Google Chrome", "Chromium", "Brave Browser"]
 
         for browser in browsers {
-            NSLog("[BC] 🌐 Trying \(browser)...")
+            NSLog("[MC] 🌐 Trying \(browser)...")
 
             let appleScript = """
             tell application "\(browser)"
@@ -143,16 +144,16 @@ class BandcampController {
             if let scriptObject = NSAppleScript(source: appleScript) {
                 let result = scriptObject.executeAndReturnError(&error)
                 if let err = error {
-                    NSLog("[BC] \(browser) error: \(err)")
+                    NSLog("[MC] \(browser) error: \(err)")
                 }
                 if error == nil && result.booleanValue {
-                    NSLog("[BC] ✅ Executed on \(browser)")
+                    NSLog("[MC] ✅ Executed on \(browser)")
                     return true
                 }
             }
         }
 
-        NSLog("[BC] ❌ Chrome-based browsers: No Bandcamp tab found")
+        NSLog("[MC] ❌ Chrome-based browsers: No Bandcamp tab found")
         return false
     }
 }

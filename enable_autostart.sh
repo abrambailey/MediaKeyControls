@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Script to enable BandcampControls to launch at login
+# Script to enable MediaKeyControls to launch at login
 
-APP_PATH="$(pwd)/build/BandcampControls.app"
-APP_NAME="BandcampControls"
+APP_PATH="$(pwd)/build/MediaKeyControls.app"
+APP_NAME="MediaKeyControls"
 
-echo "🎵 BandcampControls - Enable Auto-Start"
+echo "🎵 MediaKeyControls - Enable Auto-Start"
 echo ""
 
 # Check if app exists

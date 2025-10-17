@@ -24,7 +24,7 @@ The system consists of three components:
 1. Open Chrome and navigate to `chrome://extensions/`
 2. Enable "Developer mode" (toggle in top right corner)
 3. Click "Load unpacked"
-4. Select the `BandcampExtension` folder from this project
+4. Select the `MediaControlsExtension` folder from this project
 5. The extension should now appear in your extensions list
 
 ### Step 2: Get the Extension ID
@@ -45,7 +45,7 @@ The system consists of three components:
    {
      "name": "com.bandcamp.controls",
      "description": "Bandcamp Controls Native Host",
-     "path": "/Users/abram/Desktop/Apps/hotkeys/build/BandcampControlsHost",
+     "path": "/Users/abram/Desktop/Apps/hotkeys/build/MediaKeyControlsHost",
      "type": "stdio",
      "allowed_origins": [
        "chrome-extension://YOUR_ACTUAL_EXTENSION_ID_HERE/"
@@ -119,7 +119,7 @@ cd /Users/abram/Desktop/Apps/hotkeys
 Or manually:
 1. Open **System Settings** → **General** → **Login Items**
 2. Click the **+** button
-3. Navigate to `/Users/abram/Desktop/Apps/hotkeys/build/BandcampControls.app`
+3. Navigate to `/Users/abram/Desktop/Apps/hotkeys/build/MediaKeyControls.app`
 4. Click **Add**
 
 **Note:** The Chrome extension will auto-connect when Chrome starts. No additional setup needed!

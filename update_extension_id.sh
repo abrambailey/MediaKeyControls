@@ -2,9 +2,9 @@
 
 # Script to update the Chrome extension ID in the native messaging manifest
 
-MANIFEST_PATH="$HOME/Library/Application Support/Google/Chrome/NativeMessagingHosts/com.bandcamp.controls.json"
+MANIFEST_PATH="$HOME/Library/Application Support/Google/Chrome/NativeMessagingHosts/com.mediakeycontrols.json"
 
-echo "🔧 Bandcamp Controls - Update Extension ID"
+echo "🔧 MediaKey Controls - Update Extension ID"
 echo ""
 
 if [ ! -f "$MANIFEST_PATH" ]; then

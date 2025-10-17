@@ -17,7 +17,7 @@ class NativeMessagingHost {
         DistributedNotificationCenter.default().addObserver(
             self,
             selector: #selector(handleMediaKeyNotification(_:)),
-            name: NSNotification.Name("com.bandcamp.controls.mediakey"),
+            name: NSNotification.Name("com.mediakeycontrols.mediakey"),
             object: nil
         )
 
@@ -54,7 +54,7 @@ class NativeMessagingHost {
 
                     // Notify main app about tab state
                     DistributedNotificationCenter.default().post(
-                        name: NSNotification.Name("com.bandcamp.controls.tabstate"),
+                        name: NSNotification.Name("com.mediakeycontrols.tabstate"),
                         object: nil,
                         userInfo: [
                             "hasTabs": hasTabs,
@@ -70,7 +70,7 @@ class NativeMessagingHost {
 
                     // Notify main app about successful control
                     DistributedNotificationCenter.default().post(
-                        name: NSNotification.Name("com.bandcamp.controls.tabstate"),
+                        name: NSNotification.Name("com.mediakeycontrols.tabstate"),
                         object: nil,
                         userInfo: [
                             "hasTabs": hasBandcampTabs,

@@ -3,7 +3,7 @@ import ApplicationServices
 import ServiceManagement
 
 @main
-struct BandcampControlsApp: App {
+struct MediaControlsApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
@@ -19,7 +19,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var bandcampController: BandcampController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSLog("[BC] 🎵 BandcampControls starting up...")
+        NSLog("[MC] 🎵 MediaKey Controls starting up...")
 
         // Create menu bar item
         setupMenuBar()
@@ -30,34 +30,34 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Request accessibility permissions (this will show system dialog if needed)
         let hasPermission = checkAccessibilityPermissions()
-        NSLog("[BC] Accessibility permission status: \(hasPermission)")
+        NSLog("[MC] Accessibility permission status: \(hasPermission)")
 
         if !hasPermission {
-            NSLog("[BC] ⚠️ Missing Accessibility permissions - system dialog shown")
+            NSLog("[MC] ⚠️ Missing Accessibility permissions - system dialog shown")
 
             // Check again after a delay in case user enables it (without re-prompting)
             DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
                 if self?.checkAccessibilityPermissions(prompt: false) == true {
-                    NSLog("[BC] ✅ Permissions granted! Starting listener with retry...")
+                    NSLog("[MC] ✅ Permissions granted! Starting listener with retry...")
                     self?.startListenerWithRetry()
                 } else {
-                    NSLog("[BC] ⚠️ Still no permissions. Use 'Check Permissions' menu to restart.")
+                    NSLog("[MC] ⚠️ Still no permissions. Use 'Check Permissions' menu to restart.")
                 }
             }
         } else {
             // Permissions already granted - start immediately with retry logic
-            NSLog("[BC] Permissions already granted, starting listener with retry...")
+            NSLog("[MC] Permissions already granted, starting listener with retry...")
             startListenerWithRetry()
         }
 
-        NSLog("[BC] BandcampControls ready!")
+        NSLog("[MC] MediaKey Controls ready!")
     }
 
     func setupMenuBar() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
         if let button = statusItem?.button {
-            button.image = NSImage(systemSymbolName: "music.note", accessibilityDescription: "Bandcamp Controls")
+            button.image = NSImage(systemSymbolName: "music.note", accessibilityDescription: "MediaKey Controls")
         }
 
         updateMenu()
@@ -65,7 +65,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func updateMenu() {
         let menu = NSMenu()
-        menu.addItem(NSMenuItem(title: "Bandcamp Controls", action: nil, keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "MediaKey Controls", action: nil, keyEquivalent: ""))
         menu.addItem(NSMenuItem.separator())
 
         // Add enable/disable toggle
@@ -100,7 +100,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func toggleMediaKeys() {
         mediaKeyHandler?.toggle()
         let isEnabled = mediaKeyHandler?.getEnabled() ?? true
-        NSLog("[BC] Media keys toggled to: \(isEnabled)")
+        NSLog("[MC] Media keys toggled to: \(isEnabled)")
 
         // Update menu to reflect new state
         updateMenu()
@@ -109,41 +109,41 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let alert = NSAlert()
         alert.messageText = isEnabled ? "Media Keys Enabled" : "Media Keys Disabled"
         alert.informativeText = isEnabled
-            ? "Media keys will control Bandcamp"
-            : "Media keys will pass through to other apps (Spotify, etc.)"
+            ? "Media keys will control Bandcamp, YouTube, and Spotify"
+            : "Media keys will pass through to other apps"
         alert.alertStyle = .informational
         alert.runModal()
     }
 
     @objc func testPlayPause() {
-        NSLog("[BC] Manual test: Play/Pause")
+        NSLog("[MC] Manual test: Play/Pause")
         DistributedNotificationCenter.default().post(
-            name: NSNotification.Name("com.bandcamp.controls.mediakey"),
+            name: NSNotification.Name("com.mediakeycontrols.mediakey"),
             object: nil,
             userInfo: ["action": "playPause"]
         )
     }
 
     @objc func testNext() {
-        NSLog("[BC] Manual test: Next track")
+        NSLog("[MC] Manual test: Next track")
         DistributedNotificationCenter.default().post(
-            name: NSNotification.Name("com.bandcamp.controls.mediakey"),
+            name: NSNotification.Name("com.mediakeycontrols.mediakey"),
             object: nil,
             userInfo: ["action": "next"]
         )
     }
 
     @objc func testPrevious() {
-        NSLog("[BC] Manual test: Previous track")
+        NSLog("[MC] Manual test: Previous track")
         DistributedNotificationCenter.default().post(
-            name: NSNotification.Name("com.bandcamp.controls.mediakey"),
+            name: NSNotification.Name("com.mediakeycontrols.mediakey"),
             object: nil,
             userInfo: ["action": "previous"]
         )
     }
 
     func startListenerWithRetry(attempt: Int = 1, maxAttempts: Int = 3) {
-        NSLog("[BC] Starting listener (attempt \(attempt)/\(maxAttempts))...")
+        NSLog("[MC] Starting listener (attempt \(attempt)/\(maxAttempts))...")
 
         mediaKeyHandler?.stopListening()
         mediaKeyHandler?.startListening()
@@ -155,26 +155,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 self?.startListenerWithRetry(attempt: attempt + 1, maxAttempts: maxAttempts)
             }
         } else {
-            NSLog("[BC] ✅ Listener start attempts complete!")
+            NSLog("[MC] ✅ Listener start attempts complete!")
         }
     }
 
     @objc func recheckPermissions() {
-        NSLog("[BC] Manually rechecking permissions...")
+        NSLog("[MC] Manually rechecking permissions...")
         let wasGranted = checkAccessibilityPermissions()
 
         if wasGranted {
-            NSLog("[BC] ✅ Permissions OK! Restarting listener...")
+            NSLog("[MC] ✅ Permissions OK! Restarting listener...")
             mediaKeyHandler?.stopListening()
             mediaKeyHandler?.startListening()
 
             let alert = NSAlert()
             alert.messageText = "Permissions OK!"
-            alert.informativeText = "Media key listener has been restarted. Try pressing F8 to control Bandcamp!"
+            alert.informativeText = "Media key listener has been restarted. Try pressing F8!"
             alert.alertStyle = .informational
             alert.runModal()
         } else {
-            NSLog("[BC] ❌ Still no permissions - system dialog will appear")
+            NSLog("[MC] ❌ Still no permissions - system dialog will appear")
             // System dialog already shown by checkAccessibilityPermissions
         }
     }
@@ -201,15 +201,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if #available(macOS 13.0, *) {
             do {
                 try SMAppService.mainApp.register()
-                NSLog("[BC] ✅ Start at login enabled")
+                NSLog("[MC] ✅ Start at login enabled")
 
                 let alert = NSAlert()
                 alert.messageText = "Start at Login Enabled"
-                alert.informativeText = "BandcampControls will now start automatically when you log in."
+                alert.informativeText = "MediaKey Controls will now start automatically when you log in."
                 alert.alertStyle = .informational
                 alert.runModal()
             } catch {
-                NSLog("[BC] ❌ Failed to enable start at login: \(error)")
+                NSLog("[MC] ❌ Failed to enable start at login: \(error)")
 
                 let alert = NSAlert()
                 alert.messageText = "Failed to Enable"
@@ -219,7 +219,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         } else {
             UserDefaults.standard.set(true, forKey: "startAtLogin")
-            NSLog("[BC] ⚠️ Start at login saved to preferences (requires manual setup on macOS < 13)")
+            NSLog("[MC] ⚠️ Start at login saved to preferences (requires manual setup on macOS < 13)")
         }
     }
 
@@ -227,19 +227,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if #available(macOS 13.0, *) {
             do {
                 try SMAppService.mainApp.unregister()
-                NSLog("[BC] ✅ Start at login disabled")
+                NSLog("[MC] ✅ Start at login disabled")
 
                 let alert = NSAlert()
                 alert.messageText = "Start at Login Disabled"
-                alert.informativeText = "BandcampControls will no longer start automatically."
+                alert.informativeText = "MediaKey Controls will no longer start automatically."
                 alert.alertStyle = .informational
                 alert.runModal()
             } catch {
-                NSLog("[BC] ❌ Failed to disable start at login: \(error)")
+                NSLog("[MC] ❌ Failed to disable start at login: \(error)")
             }
         } else {
             UserDefaults.standard.set(false, forKey: "startAtLogin")
-            NSLog("[BC] ⚠️ Start at login disabled in preferences")
+            NSLog("[MC] ⚠️ Start at login disabled in preferences")
         }
     }
 
@@ -250,7 +250,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func checkAccessibilityPermissions(prompt: Bool = true) -> Bool {
         let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: prompt]
         let trusted = AXIsProcessTrustedWithOptions(options)
-        NSLog("[BC] Accessibility check result: \(trusted)")
+        NSLog("[MC] Accessibility check result: \(trusted)")
         return trusted
     }
 

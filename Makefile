@@ -1,12 +1,12 @@
 .PHONY: build run rebuild clean permissions
 
 # Variables
-APP_NAME = BandcampControls
-BUNDLE_ID = com.bandcamp.controls
+APP_NAME = MediaKeyControls
+BUNDLE_ID = com.mediakeycontrols
 BUILD_DIR = build
-SCHEME = BandcampControls
-HOST_NAME = BandcampControlsHost
-HOST_SOURCE = BandcampControls/NativeMessagingHost.swift
+SCHEME = MediaKeyControls
+HOST_NAME = MediaKeyControlsHost
+HOST_SOURCE = MediaControls/NativeMessagingHost.swift
 CHROME_NATIVE_DIR = $(HOME)/Library/Application Support/Google/Chrome/NativeMessagingHosts
 
 # Build the app
