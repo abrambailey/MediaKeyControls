@@ -15,6 +15,9 @@ build/
 .AppleDouble
 .LSOverride
 
+# Claude Code
+.claude/
+
 # App builds
 *.app
 *.dSYM.zip

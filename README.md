@@ -1,6 +1,22 @@
 # MediaKey Controls for macOS
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![macOS](https://img.shields.io/badge/macOS-12.0+-blue.svg)](https://www.apple.com/macos/)
+[![Swift](https://img.shields.io/badge/Swift-5.9+-orange.svg)](https://swift.org)
+[![Built with Claude Code](https://img.shields.io/badge/Built%20with-Claude%20Code-5A67D8.svg)](https://claude.com/claude-code)
+
 A lightweight menu bar app that lets you control Bandcamp, YouTube, and Spotify playback using your Mac's media keys (play/pause, next, previous).
+
+## Security Notice
+
+**INSTALL AT YOUR OWN RISK**: This application was developed with assistance from [Claude Code](https://claude.com/claude-code), an AI-powered development tool. While efforts have been made to follow security best practices, this software:
+- Requires accessibility permissions to intercept media key events
+- Requires automation permissions to control browsers and apps
+- Was developed with AI assistance and may contain undiscovered vulnerabilities
+
+**We strongly recommend reviewing the source code before installation.** See [SECURITY.md](SECURITY.md) for details.
+
+If you discover security issues, please submit a pull request with fixes or report them responsibly.
 
 ## Quick Start
 
@@ -100,6 +116,29 @@ The app intelligently routes your media key presses to the right service based o
 - The app captures media keys when any supported service is available
 - Other music apps won't receive media keys while this app is active
 
+## Contributing
+
+Contributions are welcome, especially:
+- Security audits and fixes
+- Bug reports and fixes
+- macOS compatibility testing
+- Code review of AI-generated code
+- Documentation improvements
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## Security
+
+This project was built with AI assistance. We welcome security-focused contributions and responsible disclosure of vulnerabilities.
+
+See [SECURITY.md](SECURITY.md) for our security policy and how to report issues.
+
+## Development Credits
+
+This project was developed with assistance from [Claude Code](https://claude.com/claude-code), an AI-powered development tool by Anthropic.
+
 ## License
 
-MIT
+MIT License - see [LICENSE](LICENSE) file for details.
+
+Copyright (c) 2025 Abram Bailey
