@@ -33,17 +33,20 @@ sleep 1
 
 echo ""
 echo "📋 Follow these steps in Chrome:"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "1. In chrome://extensions/"
-echo "   → Turn ON 'Developer mode' (toggle in top-right)"
+echo "  1️⃣  In chrome://extensions/"
+echo "      → Turn ON 'Developer mode' (toggle in top-right)"
 echo ""
-echo "2. Click 'Load unpacked' button"
-echo "   → Select the 'MediaControlsExtension' folder (just opened in Finder)"
+echo "  2️⃣  Click 'Load unpacked' button"
+echo "      → Select the 'MediaControlsExtension' folder (just opened in Finder)"
 echo ""
-echo "3. After loading, you'll see 'Media Key Controls' extension"
-echo "   → Under the name, find the Extension ID"
-echo "   → It looks like: abcdefghijklmnopqrstuvwxyz123456"
-echo "   → Copy this ID"
+echo "  3️⃣  After loading, you'll see 'Media Key Controls' extension"
+echo "      → Find the 'ID:' field under the extension name"
+echo "      → It looks like: abcdefghijklmnopqrstuvwxyz123456"
+echo "      → Copy this entire ID (click the copy button next to it)"
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
 read -p "Press Enter once you've copied the Extension ID..."
@@ -70,18 +73,53 @@ fi
 
 # Update manifest
 if [ -f "$MANIFEST_PATH" ]; then
-    sed -i '' "s/EXTENSION_ID_PLACEHOLDER/$EXT_ID/g" "$MANIFEST_PATH"
-    echo ""
-    echo "✅ Extension configured successfully!"
-    echo ""
-    echo "📌 Final step: Restart Chrome for changes to take effect"
-    echo ""
-    echo "Then test Bandcamp controls:"
-    echo "  • Open any Bandcamp album"
-    echo "  • Press F8 (play/pause), F9 (next), F7 (previous)"
-    echo ""
+    # Check if placeholder exists before replacing
+    if grep -q "EXTENSION_ID_PLACEHOLDER" "$MANIFEST_PATH"; then
+        sed -i '' "s/EXTENSION_ID_PLACEHOLDER/$EXT_ID/g" "$MANIFEST_PATH"
+        echo ""
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "✅ Extension configured successfully!"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo ""
+        echo "📝 Updated manifest:"
+        cat "$MANIFEST_PATH"
+        echo ""
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "⚠️  IMPORTANT: You MUST restart Chrome for this to work!"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo ""
+        echo "  1. Quit Chrome COMPLETELY (Cmd+Q)"
+        echo "     → Not just closing the window - fully quit the app"
+        echo ""
+        echo "  2. Reopen Chrome"
+        echo "     → The extension will now be able to communicate with the app"
+        echo ""
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "🧪 Then test the controls:"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo ""
+        echo "  • Open Bandcamp: https://bandcamp.com/"
+        echo "  • Play any album"
+        echo "  • Press F8 (play/pause), F9 (next), F7 (previous)"
+        echo ""
+        echo "💡 Tip: Check Console.app and search for 'MC' to see debug logs"
+        echo ""
+    else
+        echo ""
+        echo "⚠️  Extension ID already configured in manifest!"
+        echo ""
+        read -p "Do you want to replace it with the new ID? (y/n): " replace
+        if [[ "$replace" =~ ^[Yy]$ ]]; then
+            # Replace the existing extension ID (find the pattern in allowed_origins)
+            sed -i '' "s|chrome-extension://[^/]*/|chrome-extension://$EXT_ID/|g" "$MANIFEST_PATH"
+            echo "✅ Extension ID updated!"
+        else
+            echo "Keeping existing configuration."
+        fi
+    fi
 else
     echo ""
     echo "❌ Could not find manifest file. Please report this issue."
+    echo "Expected location: $MANIFEST_PATH"
     exit 1
 fi

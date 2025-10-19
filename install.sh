@@ -53,13 +53,25 @@ fi
 echo "✅ App built successfully!"
 echo ""
 
-# Step 2: Launch the app
-echo "🚀 Step 2: Launching the app..."
-echo "================================"
+# Step 2: Clear existing permissions (fresh start)
+echo "🔐 Step 2: Resetting permissions..."
+echo "===================================="
 echo ""
 
-# Kill any existing instance
+# Kill any existing instance first
 killall MediaKeyControls 2>/dev/null || true
+sleep 0.5
+
+# Reset accessibility permissions to ensure clean state
+echo "Clearing any existing accessibility permissions..."
+tccutil reset Accessibility com.mediakeycontrols 2>/dev/null || true
+echo "✅ Permissions cleared (you'll be prompted to grant them again)"
+echo ""
+
+# Step 3: Launch the app
+echo "🚀 Step 3: Launching the app..."
+echo "================================"
+echo ""
 
 # Launch the app
 open build/MediaKeyControls.app
@@ -75,8 +87,8 @@ echo ""
 read -p "Press Enter once you've granted the permissions..."
 echo ""
 
-# Step 3: Chrome Extension (Required for Bandcamp)
-echo "🧩 Step 3: Chrome Extension (Required for Bandcamp)"
+# Step 4: Chrome Extension (Required for Bandcamp)
+echo "🧩 Step 4: Chrome Extension (Required for Bandcamp)"
 echo "====================================================="
 echo ""
 echo "The Chrome extension is REQUIRED for Bandcamp next/prev controls."
@@ -96,9 +108,14 @@ else
 fi
 
 echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "✅ Installation Complete!"
-echo "========================="
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
+if [[ "$install_ext" =~ ^[Yy]$ ]]; then
+    echo "⚠️  REMINDER: Restart Chrome completely (Cmd+Q) for the extension to work!"
+    echo ""
+fi
 echo "🎉 You're all set! Here's how to use your media controls:"
 echo ""
 echo "Media Keys:"
@@ -107,7 +124,7 @@ echo "  • F9 or Next: Skip forward"
 echo "  • F7 or Previous: Skip backward/restart"
 echo ""
 echo "Supported Services:"
-echo "  • Bandcamp (in browser)"
+echo "  • Bandcamp (in browser with extension)"
 echo "  • YouTube (in browser)"
 echo "  • Spotify (native app)"
 echo ""
@@ -118,12 +135,14 @@ echo "  3. Whatever was last controlled"
 echo "  4. Spotify if open"
 echo ""
 echo "Menu Bar:"
-echo "  • Click the ♫ icon to toggle media key capture on/off"
+echo "  • Look for the ♫ icon in your menu bar"
+echo "  • Click it to toggle media key capture on/off"
 echo "  • The app will run automatically on next login"
 echo ""
 echo "Troubleshooting:"
 echo "  • If media keys don't work, check Accessibility permissions"
 echo "  • If browser control doesn't work, check Automation permissions"
+echo "  • If extension doesn't work, make sure Chrome was restarted"
 echo "  • Run 'make rebuild' to rebuild and restart the app"
 echo ""
 echo "For more help, see: README.md"

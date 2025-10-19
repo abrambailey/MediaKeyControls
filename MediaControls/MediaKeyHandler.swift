@@ -243,6 +243,19 @@ class MediaKeyHandler {
                     let keyState = (keyFlags & 0xFF00) >> 8
                     let keyPressed = keyState == 0xA  // Key down event
 
+                    // IMPORTANT: Only intercept our specific media keys (F7-F9 / Play, Next, Previous)
+                    // Let other system keys (brightness, keyboard backlight, etc.) pass through
+                    let isOurMediaKey = keyCode == NX_KEYTYPE_PLAY ||
+                                        keyCode == NX_KEYTYPE_NEXT ||
+                                        keyCode == NX_KEYTYPE_PREVIOUS ||
+                                        keyCode == NX_KEYTYPE_FAST ||
+                                        keyCode == NX_KEYTYPE_REWIND
+
+                    if !isOurMediaKey {
+                        // Not a media key we care about - pass through to system
+                        return Unmanaged.passRetained(event)
+                    }
+
                     // Check if we should capture this key
                     if !isEnabled {
                         // User manually disabled - pass through to other apps
