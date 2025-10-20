@@ -116,3 +116,63 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Notify that we're ready
 chrome.runtime.sendMessage({ type: 'contentScriptReady' });
+
+// Set up event listeners for playback state changes
+function setupPlaybackListeners() {
+  if (isYouTube) {
+    // YouTube - listen to video element
+    const video = document.querySelector('video');
+    if (video) {
+      video.addEventListener('play', () => {
+        console.log(`[Media Controls ${siteName}] Play event detected`);
+        chrome.runtime.sendMessage({
+          type: 'playbackStateChanged',
+          isPlaying: true,
+          site: 'youtube'
+        });
+      });
+
+      video.addEventListener('pause', () => {
+        console.log(`[Media Controls ${siteName}] Pause event detected`);
+        chrome.runtime.sendMessage({
+          type: 'playbackStateChanged',
+          isPlaying: false,
+          site: 'youtube'
+        });
+      });
+
+      console.log(`[Media Controls ${siteName}] Playback listeners attached to video element`);
+    } else {
+      // Video not ready yet, try again in a bit
+      setTimeout(setupPlaybackListeners, 1000);
+    }
+  } else {
+    // Bandcamp - watch for play button class changes
+    const playButton = document.querySelector('.playbutton');
+    if (playButton) {
+      // Use MutationObserver to watch for class changes
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === 'class') {
+            const isPlaying = playButton.classList.contains('playing');
+            console.log(`[Media Controls ${siteName}] Playback state changed: ${isPlaying}`);
+            chrome.runtime.sendMessage({
+              type: 'playbackStateChanged',
+              isPlaying: isPlaying,
+              site: 'bandcamp'
+            });
+          }
+        });
+      });
+
+      observer.observe(playButton, { attributes: true });
+      console.log(`[Media Controls ${siteName}] Playback listeners attached via MutationObserver`);
+    } else {
+      // Button not ready yet, try again in a bit
+      setTimeout(setupPlaybackListeners, 1000);
+    }
+  }
+}
+
+// Start listening for playback changes
+setupPlaybackListeners();

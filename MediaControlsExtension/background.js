@@ -206,10 +206,15 @@ function connectNative() {
 // Start connection when extension loads
 connectNative();
 
-// Listen for content script ready messages
+// Listen for content script messages
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'contentScriptReady') {
     console.log('[Media Controls] Content script ready in tab:', sender.tab.id);
+  } else if (message.type === 'playbackStateChanged') {
+    // Immediate playback state change from content script
+    console.log('[Media Controls] Playback state changed:', message.site, 'isPlaying:', message.isPlaying);
+    // Immediately trigger a state check to update the native host
+    checkPlayingState();
   }
 });
 
