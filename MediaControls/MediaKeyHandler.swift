@@ -131,21 +131,21 @@ class MediaKeyHandler {
 
     @objc func handleTabStateNotification(_ notification: Notification) {
         if let hasTabs = notification.userInfo?["hasTabs"] as? Bool {
-            let wasSuccess = hasTabs || (notification.userInfo?["success"] as? Bool) == true
             let isPlaying = (notification.userInfo?["isPlaying"] as? Bool) ?? false
+            let wasCommandSuccessful = (notification.userInfo?["success"] as? Bool) == true
 
             hasBandcampTabs = hasTabs
             isBandcampPlaying = isPlaying
             lastTabCheckTime = Date().timeIntervalSince1970
 
-            // Track successful Bandcamp control
-            if wasSuccess {
+            // Only update lastUsedTarget when an actual command succeeds, not just when tabs exist
+            if wasCommandSuccessful {
                 lastUsedTarget = .bandcamp
                 lastSuccessTime = Date().timeIntervalSince1970
                 NSLog("[MC] ✅ Bandcamp control successful, updating last used target")
             }
 
-            NSLog("[MC] Tab state updated: hasTabs=\(hasTabs), isPlaying=\(isPlaying)")
+            NSLog("[MC] Tab state updated: hasTabs=\(hasTabs), isPlaying=\(isPlaying), commandSuccess=\(wasCommandSuccessful)")
         }
     }
 
