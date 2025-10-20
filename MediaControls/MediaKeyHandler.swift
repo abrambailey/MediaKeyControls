@@ -69,6 +69,8 @@ class MediaKeyHandler {
     private var isEnabled = true // Toggle for enabling/disabling capture
     private var hasBandcampTabs = false // Track if Bandcamp tabs exist
     private var isBandcampPlaying = false // Track if any Bandcamp tab is playing
+    private var activeTabIsMedia = false // Track if the active Chrome tab is a media tab
+    private var activeTabService: String? = nil // Track which service the active tab is (bandcamp/youtube)
     private var lastTabCheckTime: TimeInterval = 0
     private var hasYouTubeTabs = false // Cached YouTube tab state
     private var isYouTubePlaying = false // Cached YouTube playing state
@@ -133,9 +135,13 @@ class MediaKeyHandler {
         if let hasTabs = notification.userInfo?["hasTabs"] as? Bool {
             let isPlaying = (notification.userInfo?["isPlaying"] as? Bool) ?? false
             let wasCommandSuccessful = (notification.userInfo?["success"] as? Bool) == true
+            let activeIsMedia = (notification.userInfo?["activeTabIsMedia"] as? Bool) ?? false
+            let activeService = notification.userInfo?["activeTabService"] as? String
 
             hasBandcampTabs = hasTabs
             isBandcampPlaying = isPlaying
+            activeTabIsMedia = activeIsMedia
+            activeTabService = activeService
             lastTabCheckTime = Date().timeIntervalSince1970
 
             // Only update lastUsedTarget when an actual command succeeds, not just when tabs exist
@@ -145,7 +151,7 @@ class MediaKeyHandler {
                 NSLog("[MC] ✅ Bandcamp control successful, updating last used target")
             }
 
-            NSLog("[MC] Tab state updated: hasTabs=\(hasTabs), isPlaying=\(isPlaying), commandSuccess=\(wasCommandSuccessful)")
+            NSLog("[MC] Tab state updated: hasTabs=\(hasTabs), isPlaying=\(isPlaying), activeTabIsMedia=\(activeIsMedia), activeTabService=\(activeService ?? "nil"), commandSuccess=\(wasCommandSuccessful)")
         }
     }
 
@@ -390,27 +396,36 @@ class MediaKeyHandler {
         else if spotifyIsFrontmost && spotifyAvailable {
             primaryTarget = .spotify
             reason = "Nothing playing, Spotify is frontmost"
-        } else if chromeIsFrontmost {
-            // Chrome is frontmost - check which service is available
-            if youtubeAvailable && bandcampAvailable {
-                // Both available - prefer last used if it's one of them
-                if lastUsedTarget == .youtube {
-                    primaryTarget = .youtube
-                    reason = "Nothing playing, Chrome frontmost, YouTube was last used"
-                } else if lastUsedTarget == .bandcamp {
+        } else if chromeIsFrontmost && activeTabIsMedia {
+            // Chrome is frontmost AND active tab is a media tab - use the specific active tab service
+            if let service = activeTabService {
+                if service == "bandcamp" && bandcampAvailable {
                     primaryTarget = .bandcamp
-                    reason = "Nothing playing, Chrome frontmost, Bandcamp was last used"
-                } else {
-                    // No clear preference, default to YouTube
+                    reason = "Nothing playing, active Bandcamp tab is in focus"
+                } else if service == "youtube" && youtubeAvailable {
                     primaryTarget = .youtube
-                    reason = "Nothing playing, Chrome frontmost, defaulting to YouTube"
+                    reason = "Nothing playing, active YouTube tab is in focus"
                 }
-            } else if youtubeAvailable {
-                primaryTarget = .youtube
-                reason = "Nothing playing, Chrome frontmost with YouTube"
-            } else if bandcampAvailable {
-                primaryTarget = .bandcamp
-                reason = "Nothing playing, Chrome frontmost with Bandcamp"
+            } else {
+                // Fallback: if we don't know which tab, use last used
+                if youtubeAvailable && bandcampAvailable {
+                    if lastUsedTarget == .youtube {
+                        primaryTarget = .youtube
+                        reason = "Nothing playing, Chrome frontmost on media tab, YouTube was last used"
+                    } else if lastUsedTarget == .bandcamp {
+                        primaryTarget = .bandcamp
+                        reason = "Nothing playing, Chrome frontmost on media tab, Bandcamp was last used"
+                    } else {
+                        primaryTarget = .youtube
+                        reason = "Nothing playing, Chrome frontmost on media tab, defaulting to YouTube"
+                    }
+                } else if youtubeAvailable {
+                    primaryTarget = .youtube
+                    reason = "Nothing playing, Chrome frontmost on YouTube tab"
+                } else if bandcampAvailable {
+                    primaryTarget = .bandcamp
+                    reason = "Nothing playing, Chrome frontmost on Bandcamp tab"
+                }
             }
         }
         // Priority 3: Use whatever was last active

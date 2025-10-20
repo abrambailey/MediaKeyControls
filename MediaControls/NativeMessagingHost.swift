@@ -49,20 +49,28 @@ class NativeMessagingHost {
                 if let type = json["type"] as? String, type == "tabState" {
                     let hasTabs = json["hasTabs"] as? Bool ?? false
                     let isPlaying = json["isPlaying"] as? Bool ?? false
+                    let activeTabIsMedia = json["activeTabIsMedia"] as? Bool ?? false
+                    let activeTabService = json["activeTabService"] as? String
 
                     hasBandcampTabs = hasTabs
 
                     // Notify main app about tab state
+                    var userInfo: [String: Any] = [
+                        "hasTabs": hasTabs,
+                        "isPlaying": isPlaying,
+                        "activeTabIsMedia": activeTabIsMedia
+                    ]
+                    if let service = activeTabService {
+                        userInfo["activeTabService"] = service
+                    }
+
                     DistributedNotificationCenter.default().post(
                         name: NSNotification.Name("com.mediakeycontrols.tabstate"),
                         object: nil,
-                        userInfo: [
-                            "hasTabs": hasTabs,
-                            "isPlaying": isPlaying
-                        ]
+                        userInfo: userInfo
                     )
 
-                    logToFile("Notified main app: hasTabs=\(hasTabs), isPlaying=\(isPlaying)")
+                    logToFile("Notified main app: hasTabs=\(hasTabs), isPlaying=\(isPlaying), activeTabIsMedia=\(activeTabIsMedia), activeTabService=\(activeTabService ?? "nil")")
                 }
                 // Handle legacy success responses
                 else if let success = json["success"] as? Bool {

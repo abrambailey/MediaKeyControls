@@ -215,49 +215,63 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Periodically check playing state and notify native host
 function checkPlayingState() {
-  chrome.tabs.query({ url: ['*://*.bandcamp.com/*', '*://*.youtube.com/watch*'] }, (tabs) => {
-    const hasTabs = tabs.length > 0;
+  // First check if the active tab in the current window is a media tab
+  chrome.tabs.query({ active: true, currentWindow: true }, (activeTabs) => {
+    const activeTab = activeTabs.length > 0 ? activeTabs[0] : null;
+    const activeTabIsMedia = activeTab && activeTab.url &&
+      (activeTab.url.includes('bandcamp.com') || activeTab.url.includes('youtube.com/watch'));
+    const activeTabService = activeTab && activeTab.url
+      ? (activeTab.url.includes('bandcamp.com') ? 'bandcamp' :
+         activeTab.url.includes('youtube.com/watch') ? 'youtube' : null)
+      : null;
 
-    if (hasTabs) {
-      // Check each tab for playing state
-      let isAnyPlaying = false;
-      let checkedCount = 0;
+    // Then get all media tabs
+    chrome.tabs.query({ url: ['*://*.bandcamp.com/*', '*://*.youtube.com/watch*'] }, (tabs) => {
+      const hasTabs = tabs.length > 0;
 
-      if (tabs.length === 0) {
-        notifyTabState(false, false);
-        return;
-      }
+      if (hasTabs) {
+        // Check each tab for playing state
+        let isAnyPlaying = false;
+        let checkedCount = 0;
 
-      tabs.forEach((tab) => {
-        chrome.tabs.sendMessage(tab.id, { action: 'getPlayingState' }, (response) => {
-          checkedCount++;
-          if (response && response.isPlaying) {
-            isAnyPlaying = true;
-          }
+        if (tabs.length === 0) {
+          notifyTabState(false, false, false);
+          return;
+        }
 
-          // Once we've checked all tabs, notify
-          if (checkedCount === tabs.length) {
-            notifyTabState(hasTabs, isAnyPlaying);
-          }
+        tabs.forEach((tab) => {
+          chrome.tabs.sendMessage(tab.id, { action: 'getPlayingState' }, (response) => {
+            checkedCount++;
+            if (response && response.isPlaying) {
+              isAnyPlaying = true;
+            }
+
+            // Once we've checked all tabs, notify
+            if (checkedCount === tabs.length) {
+              notifyTabState(hasTabs, isAnyPlaying, activeTabIsMedia, activeTabService);
+            }
+          });
         });
-      });
-    } else {
-      notifyTabState(false, false);
-    }
+      } else {
+        notifyTabState(false, false, false, null);
+      }
+    });
   });
 }
 
-function notifyTabState(hasTabs, isPlaying) {
+function notifyTabState(hasTabs, isPlaying, activeTabIsMedia, activeTabService) {
   // Send notification to native host via distributed notifications
   // The native host will forward this to the main app
   if (port) {
     port.postMessage({
       type: 'tabState',
       hasTabs: hasTabs,
-      isPlaying: isPlaying
+      isPlaying: isPlaying,
+      activeTabIsMedia: activeTabIsMedia,
+      activeTabService: activeTabService
     });
   }
-  console.log('[Media Controls] 📊 Tab state - hasTabs:', hasTabs, 'isPlaying:', isPlaying);
+  console.log('[Media Controls] 📊 Tab state - hasTabs:', hasTabs, 'isPlaying:', isPlaying, 'activeTabIsMedia:', activeTabIsMedia, 'activeTabService:', activeTabService);
 }
 
 // Check playing state every 2 seconds
